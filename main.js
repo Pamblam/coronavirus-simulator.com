@@ -1,0 +1,170 @@
+
+var sim;
+window.onload = function () {
+	var sim;
+	
+	document.getElementById('people-slider').addEventListener('input', function(){
+		document.getElementById('people-display').value = this.value;
+	});
+	document.getElementById('people-display').addEventListener('change', function(){
+		if(isNaN(+this.value)) this.value = 50;
+		if(+this.value < 1) this.value = 1;
+		if(+this.value > 300) this.value = 300;
+		document.getElementById('people-slider').value = +this.value;
+	});
+	
+	document.getElementById('duration-slider').addEventListener('input', function(){
+		document.getElementById('duration-display').value = (this.value/1000).toFixed(3);
+	});
+	document.getElementById('duration-display').addEventListener('change', function(){
+		if(isNaN(+this.value)) this.value = 15;
+		if(+this.value < 0.001) this.value = 0.001;
+		if(+this.value > 30) this.value = 30.000;
+		this.value = (+this.value).toFixed(3);
+		document.getElementById('duration-slider').value = (+this.value)*1000;
+	});
+	
+	
+	document.getElementById('mr-slider').addEventListener('input', function(){
+		document.getElementById('mr-display').value = (this.value/1000).toFixed(3);
+	});
+	document.getElementById('mr-display').addEventListener('change', function(){
+		if(isNaN(+this.value)) this.value = 15;
+		if(+this.value < 0.001) this.value = 0.001;
+		if(+this.value > 99.999) this.value = 99.999;
+		this.value = (+this.value).toFixed(3);
+		document.getElementById('mr-slider').value = (+this.value)*1000;
+	});
+	
+	document.getElementById('immunity-slider').addEventListener('input', function(){
+		document.getElementById('immunity-display').value = (this.value/1000).toFixed(3);
+	});
+	document.getElementById('immunity-display').addEventListener('change', function(){
+		if(isNaN(+this.value)) this.value = 15;
+		if(+this.value < 0) this.value = 0.000;
+		if(+this.value > 365) this.value = 365.000;
+		this.value = (+this.value).toFixed(3);
+		document.getElementById('immunity-slider').value = (+this.value)*1000;
+	});
+	
+	document.getElementById('q-slider').addEventListener('input', function(){
+		document.getElementById('q-display').value = (this.value/1000).toFixed(3);
+	});
+	document.getElementById('q-display').addEventListener('change', function(){
+		if(isNaN(+this.value)) this.value = 35;
+		if(+this.value < 0) this.value = 0.000;
+		if(+this.value > 100) this.value = 100.000;
+		this.value = (+this.value).toFixed(3);
+		document.getElementById('q-slider').value = (+this.value)*1000;
+	});
+	
+	document.getElementById('start-sim-btn').addEventListener('click', function(e){
+		e.preventDefault();
+		document.getElementById('input-row').style.display = 'none';
+		document.getElementById('sim-row').style.display = 'block';
+		
+		runSim();
+	});
+	
+	function runSim(){
+		if(sim) sim.stop();
+		
+		var person_count = +document.getElementById('people-slider').value;
+		var speed_ms = 50;
+		var time_to_recovery_ms = +document.getElementById('duration-slider').value;
+		var mortality_rate = +document.getElementById('mr-display').value;
+		var immunity_time = +document.getElementById('immunity-slider').value;
+		var quarantined_pct = +document.getElementById('q-display').value;
+		
+		var canvas = document.getElementById('canvas');
+		canvas.width = 500;
+		canvas.height = 500;
+
+		var data_points = {}, frame = 0;
+
+		sim = new Simulation(canvas, person_count, speed_ms, time_to_recovery_ms, mortality_rate, immunity_time, quarantined_pct);
+		sim.onUpdate(function(){
+			frame++;
+			var stats = this.getStats();
+			
+			if(stats.states.infected === 0){
+				sim.stop();
+
+				$('.nav-tabs a[href="#result"]').tab('show');
+				var opts = {
+					animationEnabled: true,
+					title: {
+						text: "Simulation Results"
+					},
+					axisY: {},
+					axisX: {},
+					toolTip: {
+						shared: true
+					},
+					data: []
+				};
+
+				Object.keys(data_points).forEach(k=>{
+					opts.data.push({
+						type: "stackedArea",
+						showInLegend: true,
+						toolTipContent: "<span style=\"color:#4F81BC\"><strong>{name}: </strong></span> {y}",
+						name: k,
+						dataPoints: data_points[k]
+					});
+				});
+
+				var chart = new CanvasJS.Chart("chartContainer", opts);
+				chart.render();
+			}
+			
+			
+			Object.keys(stats).forEach(k=>{
+				Object.keys(stats[k]).forEach(kk=>{
+					if(k === 'states'){
+						if(!data_points[kk]) data_points[kk] = [];
+						data_points[kk].push({ x: frame, y: stats[k][kk] });
+						stats[k][kk] = stats[k][kk]+(stats[k][kk] === 1 ? " person" : " people");
+					}
+					if(k === 'settings'){
+						if(kk === 'sample-size') stats[k][kk] = stats[k][kk]+ (stats[k][kk] === 1 ? " person" : " people");
+						if(kk === 'time-to-recovery') stats[k][kk] = (stats[k][kk]/1000).toFixed(3)+" days";
+						if(kk === 'mortality') stats[k][kk] = stats[k][kk]+"%";
+						if(kk === 'immnuity-length') stats[k][kk] = (stats[k][kk]/1000).toFixed(3)+" days";
+						if(kk === 'quarantined') stats[k][kk] = stats[k][kk].toFixed(3)+"%";
+					}
+					if(k === 'time'){
+						if(kk === 'frames') stats[k][kk] = stats[k][kk].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+						if(kk === 'elapsed') stats[k][kk] = formatElapsedTime({
+							base_units: 'day',
+							elapsed_time: stats[k][kk]/1000,
+							show_units: ['Days'],
+							return_as_object: true
+						}).days +" days";
+					}
+					if(k === 'actions'){
+						if(kk === 'moving') stats[k][kk] = stats[k][kk]+(stats[k][kk] === 1 ? " person" : " people");
+						if(kk === 'quarantined') stats[k][kk] = stats[k][kk]+(stats[k][kk] === 1 ? " person" : " people");
+					}
+					if(k === 'risk'){
+						if(kk === 'immune') stats[k][kk] = stats[k][kk]+(stats[k][kk] === 1 ? " person" : " people");
+						if(kk === 'at-risk') stats[k][kk] = stats[k][kk]+(stats[k][kk] === 1 ? " person" : " people");
+					}
+					if(k === 'result'){
+						if(kk === 'mortality-rate') stats[k][kk] = stats[k][kk]+"%";
+						if(kk === 'elapsed-time') stats[k][kk] = stats[k][kk] === 0 ? 'incomplete' : formatElapsedTime({
+							base_units: 'ms',
+							elapsed_time: 15431233224,
+							show_units: stats[k][kk]
+						});
+					}
+					document.getElementById(`${kk}-${k}`).innerHTML = stats[k][kk];
+				});
+			});
+
+		});
+		sim.start();
+	}
+	
+	
+}
