@@ -8,14 +8,17 @@
 		<title>Virus Simulator</title>
 
 		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-		
+		<link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' rel="stylesheet">
 		<style>
+			.navbar-brand, .logo-text{
+				font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif; 
+			}
 			.tiny-input{
 				margin:0; 
 				padding: 0;
 				width:4em;
 			}
-			canvas{
+			#canvas{
 				border: 1px solid black;
 			}
 			.slidecontainer {
@@ -63,13 +66,20 @@
 			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
 		
+		
+		<meta property="og:title" content="Virus Simulator" />
+		<meta property="og:url" content="https://coronavirus-simulator.com/" />
+		<meta property="og:type" content="game" />
+		<meta property="og:description" content="Simulate the spread of a virus through a population. Learn how the novel coronavirus and other viruses behave with this visual simulation." />
+		<meta property=”og:image” content=”https://coronavirus-simulator.com/img/banner.jpg” />
+		
 		<script data-ad-client="ca-pub-6915243891499132" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 	</head>
 	<body>
 		<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="#">Virus Simulator</a>
+					<a class="navbar-brand" href="#"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>Virus Simulator</a>
 				</div>
 			</div>
 		</nav>
@@ -77,175 +87,235 @@
 		<div class="container">
 			<div class="row" id='input-row'>
 				<div class="col-lg-12">
-					<label>Number of People to test (<input class='tiny-input' id='people-display' value='50'>)</label>
-					<div class="slidecontainer">
-						<input type="range" min="1" max="300" value="50" class="slider" id='people-slider'>
+					<div class="panel panel-default">
+						<div class="panel-heading logo-text">
+							<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>Virus Simulator
+						</div>
+						<div class="panel-body">
+							<label><i class="fa fa-users" aria-hidden="true"></i> Number of People to test (<input class='tiny-input' id='people-display' value='50'>)</label>
+							<div class="slidecontainer">
+								<input type="range" min="1" max="300" value="50" class="slider" id='people-slider'>
+							</div>
+							<br>
+
+							<label><i class="fa fa-clock-o" aria-hidden="true"></i> Average duration of infection (<input class='tiny-input' id='duration-display' value='15.000'> days)</label>
+							<div class="slidecontainer">
+								<input type="range" min="1" max="30000" value="15000" class="slider" id='duration-slider'>
+							</div>
+							<br>
+
+							<label><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Average Mortality Rate (<input class='tiny-input' id='mr-display' value='15.000'>%)</label>
+							<div class="slidecontainer">
+								<input type="range" min="1" max="99999" value="15000" class="slider" id='mr-slider'>
+							</div>
+							<br>
+
+							<label><i class="fa fa-clock-o" aria-hidden="true"></i> Duration of immunity after recovery (<input class='tiny-input' id='immunity-display' value='15.00'> days)</label>
+							<div class="slidecontainer">
+								<input type="range" min="0" max="365000" value="15000" class="slider" id='immunity-slider'>
+							</div>
+							<br>
+
+							<label><i class="fa fa-percent" aria-hidden="true"></i> Percent of population in quarantine (<input class='tiny-input' id='q-display' value='35.00'>%)</label>
+							<div class="slidecontainer">
+								<input type="range" min="0" max="100000" value="35000" class="slider" id='q-slider'>
+							</div>
+							<br>
+
+							<button class='btn btn-primary' id='start-sim-btn'><i class="fa fa-play" aria-hidden="true"></i> Run Simulation</button>
+						</div>
 					</div>
-					<br>
-					
-					<label>Average duration of infection (<input class='tiny-input' id='duration-display' value='15.000'> days)</label>
-					<div class="slidecontainer">
-						<input type="range" min="1" max="30000" value="15000" class="slider" id='duration-slider'>
-					</div>
-					<br>
-					
-					<label>Average Mortality Rate (<input class='tiny-input' id='mr-display' value='15.000'>%)</label>
-					<div class="slidecontainer">
-						<input type="range" min="1" max="99999" value="15000" class="slider" id='mr-slider'>
-					</div>
-					<br>
-					
-					<label>Duration of immunity after recovery (<input class='tiny-input' id='immunity-display' value='15.00'> days)</label>
-					<div class="slidecontainer">
-						<input type="range" min="0" max="365000" value="15000" class="slider" id='immunity-slider'>
-					</div>
-					<br>
-					
-					<label>Percent of population in quarantine (<input class='tiny-input' id='q-display' value='35.00'>%)</label>
-					<div class="slidecontainer">
-						<input type="range" min="0" max="100000" value="35000" class="slider" id='q-slider'>
-					</div>
-					<br>
-					
-					<button class='btn btn-primary' id='start-sim-btn'>Run Simulation</button>
 				</div>
 			</div>
 			<div class="row" style="display:none;" id='sim-row'>
-				<div class="col-lg-6">
-					<canvas id="canvas" class="sim-canvas img-responsive"></canvas>
-				</div>
-				<div class="col-lg-6">
-					<h1>Simulaton Stats</h1>
-					<div>
+				
+				<div class="panel panel-default">
+					<div class="panel-heading logo-text">
+						<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Virus Simulator
+					</div>
+					<div class="panel-body">
+						<div class='row'>
+							<div class="col-lg-6">
+								<canvas id="canvas" class="sim-canvas img-responsive"></canvas>
+								<img src='./img/legend.png' class="img-responsive">
+							</div>
+							<div class="col-lg-6">
+								<h1><i class="fa fa-area-chart" aria-hidden="true"></i> Simulaton Stats</h1>
+								<div>
 
-						<ul class="nav nav-tabs">
-							<li class="active"><a data-toggle="tab" href="#settings">Settings</a></li>
-							<li><a data-toggle="tab" href="#time">Time</a></li>
-							<li><a data-toggle="tab" href="#actions">Actions</a></li>
-							<li><a data-toggle="tab" href="#states">States</a></li>
-							<li><a data-toggle="tab" href="#risk">Risk</a></li>
-							<li><a data-toggle="tab" href="#result">Results</a></li>
-						</ul>
-						<div class="tab-content">
-							<div id="settings" class="tab-pane fade in active">
-								<table class="table table-striped">
-									<tbody>
-										<tr>
-											<td><b>Sample Size</b></td>
-											<td id="sample-size-settings"></td>
-										</tr>
-										<tr>
-											<td><b>Time to Recovery</b></td>
-											<td id="time-to-recovery-settings"></td>
-										</tr>
-										<tr>
-											<td><b>Estimated Mortality Rate</b></td>
-											<td id="mortality-settings"></td>
-										</tr>
-										<tr>
-											<td style='color: #fcba03'><b>Immunity Duration</b></td>
-											<td id="immnuity-length-settings"></td>
-										</tr>
-										<tr>
-											<td style='color: #9e9e9e'><b>% Quarantined</b></td>
-											<td id="quarantined-settings"></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div id="time" class="tab-pane fade">
-								<table class="table table-striped">
-									<tbody>
-										<tr>
-											<td><b>Frame #</b></td>
-											<td id="frame-time"></td>
-										</tr>
-										<tr>
-											<td><b>Elapsed Time</b></td>
-											<td id="elapsed-time"></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div id="actions" class="tab-pane fade">
-								<table class="table table-striped">
-									<tbody>
-										<tr>
-											<td><b>Active</b></td>
-											<td id="moving-actions"></td>
-										</tr>
-										<tr>
-											<td style='color: #9e9e9e'><b>Quarantined</b></td>
-											<td id="quarantined-actions"></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div id="states" class="tab-pane fade">
-								<table class="table table-striped">
-									<tbody>
-										<tr>
-											<td style='color: #FF0000'><b>Infected</b></td>
-											<td id="infected-states"></td>
-										</tr>
-										<tr>
-											<td style='color: #00FF00'><b>Healthy (Never Infected)</b></td>
-											<td id="healthy-states"></td>
-										</tr>
-										<tr>
-											<td style='color: #0000FF'><b>Healed (Previously Infected)</b></td>
-											<td id="healed-states"></td>
-										</tr>
-										<tr>
-											<td style='color: #000000'><b>Dead</b></td>
-											<td id="dead-states"></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div id="risk" class="tab-pane fade">
-								<table class="table table-striped">
-									<tbody>
-										<tr>
-											<td style='color: #fcba03'><b>Temporarily Immune</b></td>
-											<td id="immune-risk"></td>
-										</tr>
-										<tr>
-											<td><b>At Risk</b></td>
-											<td id="at-risk-risk"></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div id="result" class="tab-pane fade">
-								<table class="table table-striped">
-									<tbody>
-										<tr>
-											<td><b>Actual Mortality Rate</b></td>
-											<td id="mortality-rate-result"></td>
-										</tr>
-										<tr>
-											<td><b>Elapsed Time</b></td>
-											<td id="elapsed-time-result"></td>
-										</tr>
-									</tbody>
-								</table>
-								<br>
-								<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+									<ul class="nav nav-tabs">
+										<li><a data-toggle="tab" href="#settings">Settings</a></li>
+										<li><a data-toggle="tab" href="#time">Time</a></li>
+										<li><a data-toggle="tab" href="#actions">Actions</a></li>
+										<li class="active"><a data-toggle="tab" href="#states">States</a></li>
+										<li><a data-toggle="tab" href="#risk">Risk</a></li>
+										<li><a data-toggle="tab" href="#result">Results</a></li>
+									</ul>
+									<div class="tab-content">
+										<div id="settings" class="tab-pane fade">
+											<table class="table table-striped">
+												<tbody>
+													<tr>
+														<td><b>Sample Size</b></td>
+														<td id="sample-size-settings"></td>
+													</tr>
+													<tr>
+														<td><b>Time to Recovery</b></td>
+														<td id="time-to-recovery-settings"></td>
+													</tr>
+													<tr>
+														<td><b>Estimated Mortality Rate</b></td>
+														<td id="mortality-settings"></td>
+													</tr>
+													<tr>
+														<td style='color: #fcba03'><b>Immunity Duration</b></td>
+														<td id="immnuity-length-settings"></td>
+													</tr>
+													<tr>
+														<td style='color: #9e9e9e'><b>% Quarantined</b></td>
+														<td id="quarantined-settings"></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div id="time" class="tab-pane fade">
+											<table class="table table-striped">
+												<tbody>
+													<tr>
+														<td><b>Frame #</b></td>
+														<td id="frame-time"></td>
+													</tr>
+													<tr>
+														<td><b>Elapsed Time</b></td>
+														<td id="elapsed-time"></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div id="actions" class="tab-pane fade">
+											<table class="table table-striped">
+												<tbody>
+													<tr>
+														<td><b>Active</b></td>
+														<td id="moving-actions"></td>
+													</tr>
+													<tr>
+														<td style='color: #9e9e9e'><b>Quarantined</b></td>
+														<td id="quarantined-actions"></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div id="states" class="tab-pane fade in active">
+											<table class="table table-striped">
+												<tbody>
+													<tr>
+														<td style='color: #FF0000'><b>Infected</b></td>
+														<td id="infected-states"></td>
+													</tr>
+													<tr>
+														<td style='color: #00FF00'><b>Healthy (Never Infected)</b></td>
+														<td id="healthy-states"></td>
+													</tr>
+													<tr>
+														<td style='color: #0000FF'><b>Healed (Previously Infected)</b></td>
+														<td id="healed-states"></td>
+													</tr>
+													<tr>
+														<td style='color: #000000'><b>Dead</b></td>
+														<td id="dead-states"></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div id="risk" class="tab-pane fade">
+											<table class="table table-striped">
+												<tbody>
+													<tr>
+														<td style='color: #fcba03'><b>Temporarily Immune</b></td>
+														<td id="immune-risk"></td>
+													</tr>
+													<tr>
+														<td><b>At Risk</b></td>
+														<td id="at-risk-risk"></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div id="result" class="tab-pane fade">
+											<table class="table table-striped">
+												<tbody>
+													<tr>
+														<td><b>Actual Mortality Rate</b></td>
+														<td id="mortality-rate-result"></td>
+													</tr>
+													<tr>
+														<td><b>Elapsed Time</b></td>
+														<td id="elapsed-time-result"></td>
+													</tr>
+												</tbody>
+											</table>
+											<br>
+											<canvas id="chart-canvas" style="height: 370px; width: 100%;"></canvas>
+										</div>
+									</div>
+
+								</div>
 							</div>
 						</div>
-						
 					</div>
+				</div>
+					
+			</div>
+			<div class='row'>
+				<div class='col-lg-12'>
+					<h3>How to use <a class='logo-text' href='virus-simulator.net'><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>Virus Simulator</a></h3>
+					<p>Using the Simulator is simple and straightforward. Enter your settings and tap the button labeled <i>"Run Simulator"</i>. The settings are explained as follows:</p>
+					<ul>
+						<li>
+							<b><i class="fa fa-users" aria-hidden="true"></i> Number of People to test</b> - How many people should be in your simulation. You can use up to 300, anything above that should be scaled.
+						</li>
+						<li>
+							<b><i class="fa fa-clock-o" aria-hidden="true"></i> Average duration of infection</b> - How long does it take for the virus to "run it's course?" At the end of this period, the host is either recovered or dead. If the host recovers, it will be temporarily immune to catching the virus again.
+						</li>
+						<li>
+							<b><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Average Mortality Rate</b> - This is a baseline representation for how many people would die from the disease caused by the virus. The final Mortality Rate should be close to this number, but other settings, such as the quarantine percentage will affect that number as well.
+						</li>
+						<li>
+							<b><i class="fa fa-clock-o" aria-hidden="true"></i> Duration of immunity after recovery</b> - How long does a person's antibodies affectively make them immune from contracting the virus again after recovering from the disease.
+						</li>
+						<li>
+							<b><i class="fa fa-percent" aria-hidden="true"></i> Percent of population in quarantine</b> - At any given time, this percent of the population should be in quarantine. Those in quarantine in this simulation will not contract or spread the virus.
+						</li>
+					</ul>
+					<h3>How does the <a class='logo-text' href='virus-simulator.net'><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>Virus Simulator</a> work?</h3>
+					<p>Virus Simulator is a small scale simulation of how a virus interacts with a population, and how the population reacts to a virus. As your test subjects roam around the simulation freely they risk spreading or catching the virus. All infections result in either death or recovery. Ultimately the virus will either kill off all it's hosts or the hosts will defeat all the viruses. When the virus is gone the simulation is over.</p>
+					<h3>Can this simulator predict the outcome of the Novel Coronavirus that causes <b>Covid-19</b>?</h3>
+					<p>No. There are too many factors involved for any simulation to accurately predict the outcome of any real virus. For example, no one knows the actual mortality rate of the <b>new Coronavirus</b> because we can't test everyone. We can't say for sure how many people are quarantining either. We can use this tool to demonstrate how a virus interacts with a population and make educated guesses.</p>
+					
+					
+					
+					<bR><br><bR>
 				</div>
 			</div>
 		</div>
 
 		<script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 		<script src="Simulation.js"></script>
 		<script src="formatElapsedTime.js"></script>
 		<script src="Person.js"></script>
 		<script src="main.js"></script>
+		
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-161712472-1"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'UA-161712472-1');
+		</script>
+		
 	</body>
 </html>

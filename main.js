@@ -1,7 +1,6 @@
 
 var sim;
 window.onload = function () {
-	var sim;
 	
 	document.getElementById('people-slider').addEventListener('input', function(){
 		document.getElementById('people-display').value = this.value;
@@ -89,33 +88,68 @@ window.onload = function () {
 			
 			if(stats.states.infected === 0){
 				sim.stop();
+				stats = this.getStats();
 
 				$('.nav-tabs a[href="#result"]').tab('show');
-				var opts = {
-					animationEnabled: true,
-					title: {
-						text: "Simulation Results"
+				
+				var labels = data_points.healthy.map((i,n)=>"Frame "+n);
+				
+				var config = {
+					type: 'line',
+					data: {
+						labels: labels,
+						datasets: []
 					},
-					axisY: {},
-					axisX: {},
-					toolTip: {
-						shared: true
-					},
-					data: []
+					options: {
+						responsive: true,
+						title: {
+							display: false,
+							text: 'Simulation Curve'
+						},elements: {
+							point:{
+								radius: 0
+							}
+						},
+						scales: {
+							xAxes: [{
+								scaleLabel: {
+									display: false,
+									labelString: 'Frame'
+								},
+								ticks: {
+									display: false
+								}
+							}],
+							yAxes: [{
+								stacked: true,
+								scaleLabel: {
+									display: false,
+									labelString: 'People'
+								},
+								ticks: {
+									display: false
+								}
+							}]
+						}
+					}
 				};
-
+				
 				Object.keys(data_points).forEach(k=>{
-					opts.data.push({
-						type: "stackedArea",
-						showInLegend: true,
-						toolTipContent: "<span style=\"color:#4F81BC\"><strong>{name}: </strong></span> {y}",
-						name: k,
-						dataPoints: data_points[k]
+					var key = k.toUpperCase();
+					var color = key === 'HEALTHY' ? '#00FF00' :
+								key === 'INFECTED' ? '#FF0000' : 
+								key === 'HEALED' ? '#0000FF' :
+								'#000000';
+					config.data.datasets.push({
+						label: k.toUpperCase(),
+						backgroundColor: color,
+						fill: 'origin',
+						data: data_points[k]
 					});
 				});
-
-				var chart = new CanvasJS.Chart("chartContainer", opts);
-				chart.render();
+				
+				var ctx = document.getElementById('chart-canvas').getContext('2d');
+				var chart = new Chart(ctx, config);
 			}
 			
 			
@@ -123,7 +157,7 @@ window.onload = function () {
 				Object.keys(stats[k]).forEach(kk=>{
 					if(k === 'states'){
 						if(!data_points[kk]) data_points[kk] = [];
-						data_points[kk].push({ x: frame, y: stats[k][kk] });
+						data_points[kk].push(stats[k][kk]);
 						stats[k][kk] = stats[k][kk]+(stats[k][kk] === 1 ? " person" : " people");
 					}
 					if(k === 'settings'){
@@ -154,8 +188,7 @@ window.onload = function () {
 						if(kk === 'mortality-rate') stats[k][kk] = stats[k][kk]+"%";
 						if(kk === 'elapsed-time') stats[k][kk] = stats[k][kk] === 0 ? 'incomplete' : formatElapsedTime({
 							base_units: 'ms',
-							elapsed_time: 15431233224,
-							show_units: stats[k][kk]
+							elapsed_time: stats[k][kk]
 						});
 					}
 					document.getElementById(`${kk}-${k}`).innerHTML = stats[k][kk];

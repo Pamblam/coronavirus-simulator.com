@@ -1,0 +1,4 @@
+Sitemap: https://coronavirus-simulator.com/sitemap.xml
+
+User-agent: *
+Allow: /
