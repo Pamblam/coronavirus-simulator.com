@@ -32,7 +32,7 @@ foreach($files as $file){
 		
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
 		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
-
+		<script data-ad-client="ca-pub-6915243891499132" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 		<title>Covid-19 Testing Charts</title>
 	</head>
 	<body>
@@ -55,6 +55,8 @@ foreach($files as $file){
 				coronavirus numbers we see on the news every day by comparing the number of covid-19 cases relative to the number of tests performed by state.
 			</p>
 			
+			<small>The data illustrated here is is from the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University. You can download the raw data from <a href='https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports_us'>GitHub</a>.</small>
+			
 			<div class='alert alert-info'>
 				<p>You can see the charts by state, or look at the aggregated data for the entire country.</p>
 
@@ -74,7 +76,7 @@ foreach($files as $file){
 				number of tests is such an important piece of context to consider when measuring the overall case numbers.
 			</p>
 			
-			<div id='chart1' style='height:30em;'></div>
+			<div id='chart1' style='height:30em;'></div><br>
 			
 			<h3>Cases Relative to the Total Number of Tests Performed</h3>
 			
@@ -83,9 +85,9 @@ foreach($files as $file){
 				that may be in increase in positives, but it's actually a stark decrease in the percent of positive tests. This chart shows the percentages rather than the raw numbers.
 			</p>
 			
-			<div id='chart3' style='height:30em;'></div>
+			<div id='chart3' style='height:30em;'></div><br>
 			
-			<h3>Where are the spikes</h3>
+			<h3>Where are the spikes?</h3>
 			
 			<p>
 				For each US state and province, this table lists the all-time lowest positive test rate (percent), the all-time highest positive test rate, and the most current test rate. 
@@ -106,6 +108,9 @@ foreach($files as $file){
 				<tbody></tbody>
 			</table>
 		</div>		
+		<br>
+		<center><a href='../'>Back to the Virus Simulator</a></center>
+		<br><br>
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

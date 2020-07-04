@@ -10,16 +10,16 @@ function drawCharts(state) {
 	chart1.draw(data1, {
 		title: 'Total Tests ' + ('ALL' === state ? "in the US" : "in "+state),
 		legend: {position: 'bottom'},
-		width: $("#chart3").width(),
-		chartArea: {width: $("#chart3").width()}
+//		width: $("#chart3").width(),
+//		chartArea: {width: $("#chart3").width()}
 	});
 	var data3 = google.visualization.arrayToDataTable(getChartData('Percent of Positives', state));
 	var chart3 = new google.visualization.LineChart(document.getElementById('chart3'));
 	chart3.draw(data3, {
 		title: 'Percent of Positive Test Results ' + ('ALL' === state ? "in the US" : "in "+state),
 		legend: {position: 'bottom'},
-		width: $("#chart3").width(),
-		chartArea: {width: $("#chart3").width()}
+//		width: $("#chart3").width(),
+//		chartArea: {width: $("#chart3").width()}
 	});
 }
 
